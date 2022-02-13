@@ -155,39 +155,20 @@
         android:gravity="center"
         android:orientation="vertical"
         android:weightSum="1" >
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+            <com.kircherelectronics.gyroscopeexplorer.gauge.GaugeRotation
+                android:id="@+id/gauge_tilt_calibrated"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"/>
+            <ImageView
+                android:id="@+id/pointer"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:src="@drawable/gyroscope_explorer"/>
+        </FrameLayout>
 
-        <com.kircherelectronics.gyroscopeexplorer.gauge.GaugeBearing
-            android:id="@+id/gauge_bearing_calibrated"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="0.5" />
-
-        <com.kircherelectronics.gyroscopeexplorer.gauge.GaugeRotation
-            android:id="@+id/gauge_tilt_calibrated"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="0.5" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="fill_parent"
-        android:layout_height="0dp"
-        android:layout_marginBottom="15dp"
-        android:layout_weight="1.25"
-        android:gravity="center"
-        android:orientation="horizontal"
-        android:weightSum="1" >
-
-        <com.kircherelectronics.gyroscopeexplorer.view.VectorDrawableButton
-            android:id="@+id/button_start"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:text="@string/action_start"
-            android:layout_weight="0.5"
-            android:backgroundTint="@color/dark_blue"
-            android:theme="@style/AppTheme.BlueButton"
-            android:textStyle="bold"
-            app:drawableBottomCompat="@drawable/ic_timeline_white_48px"/>
     </LinearLayout>
 
 </LinearLayout>
