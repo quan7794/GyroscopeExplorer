@@ -15,12 +15,10 @@ import com.kircherelectronics.fsensor.sensor.gyroscope.ComplementaryGyroscopeSen
 import com.kircherelectronics.fsensor.sensor.gyroscope.KalmanGyroscopeSensor
 import android.os.Handler
 import android.os.Looper
-import android.preference.PreferenceManager
 import android.view.*
 import android.widget.FrameLayout
 import androidx.appcompat.widget.Toolbar
-import androidx.core.view.marginLeft
-import androidx.core.view.marginTop
+import androidx.preference.PreferenceManager
 import com.kircherelectronics.gyroscopeexplorer.databinding.ActivityGyroscopeBinding
 import java.util.*
 import kotlin.math.abs
