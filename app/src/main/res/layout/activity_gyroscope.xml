@@ -138,6 +138,38 @@
                             android:textAppearance="?android:attr/textAppearanceMedium" />
                     </RelativeLayout>
                 </TableRow>
+                <TableRow
+                    android:id="@+id/table_calibrated_statistics_left_row_1"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="2dip" >
+
+                    <RelativeLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginRight="20dp"
+                        android:layout_weight="1" >
+
+                        <TextView
+                            android:id="@+id/xDelta"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/value_default"
+                            android:textAppearance="?android:attr/textAppearanceMedium" />
+                    </RelativeLayout>
+
+                    <RelativeLayout
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1" >
+                        <TextView
+                            android:id="@+id/yDelta"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/value_default"
+                            android:textAppearance="?android:attr/textAppearanceMedium" />
+                    </RelativeLayout>
+                </TableRow>
             </TableLayout>
         </RelativeLayout>
     </RelativeLayout>

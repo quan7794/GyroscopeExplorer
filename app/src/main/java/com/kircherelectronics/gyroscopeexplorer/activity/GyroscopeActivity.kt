@@ -1,7 +1,6 @@
 package com.kircherelectronics.gyroscopeexplorer.activity
 
 import androidx.appcompat.app.AppCompatActivity
-import android.widget.TextView
 import com.kircherelectronics.fsensor.sensor.FSensor
 import com.kircherelectronics.fsensor.filter.averaging.MeanFilter
 import com.kircherelectronics.fsensor.observer.SensorSubject.SensorObserver
@@ -18,10 +17,11 @@ import android.os.Looper
 import android.view.*
 import android.widget.FrameLayout
 import androidx.appcompat.widget.Toolbar
+import androidx.core.view.marginLeft
+import androidx.core.view.marginTop
 import androidx.preference.PreferenceManager
 import com.kircherelectronics.gyroscopeexplorer.databinding.ActivityGyroscopeBinding
 import java.util.*
-import kotlin.math.abs
 
 open class GyroscopeActivity : AppCompatActivity() {
     private var meanFilterEnabled = false
@@ -34,13 +34,15 @@ open class GyroscopeActivity : AppCompatActivity() {
     // Handler for the UI plots so everything plots smoothly
     protected lateinit var uiHandler: Handler
     private lateinit var uiRunnable: Runnable
-    private var tvXAxis: TextView? = null
-    private var tvYAxis: TextView? = null
-    private var tvZAxis: TextView? = null
     private var fSensor: FSensor? = null
     private var meanFilter: MeanFilter? = null
     private var helpDialog: Dialog? = null
     private val sensorObserver = SensorObserver { values -> updateValues(values) }
+
+    private var lastX: Int? = null
+    private var lastY: Int? = null
+    private val sensitivity = 50
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -107,29 +109,9 @@ open class GyroscopeActivity : AppCompatActivity() {
         val toolbar = findViewById<Toolbar>(R.id.toolbar)
         setSupportActionBar(toolbar)
         if (supportActionBar != null) supportActionBar!!.setDisplayShowHomeEnabled(true)
-
-        // Initialize the calibrated text views
-        tvXAxis = findViewById(R.id.value_x_axis_calibrated)
-        tvYAxis = findViewById(R.id.value_y_axis_calibrated)
-        tvZAxis = findViewById(R.id.value_z_axis_calibrated)
-
-        // Initialize the calibrated gauges views
     }
 
-    private fun readPrefs(): Mode {
-        meanFilterEnabled = prefMeanFilterEnabled
-        val complimentaryFilterEnabled = prefComplimentaryEnabled
-        val kalmanFilterEnabled = prefKalmanEnabled
-        if (meanFilterEnabled) meanFilter!!.setTimeConstant(prefMeanFilterTimeConstant)
-        val mode: Mode = if (!complimentaryFilterEnabled && !kalmanFilterEnabled) {
-            Mode.GYROSCOPE_ONLY
-        } else if (complimentaryFilterEnabled) {
-            Mode.COMPLIMENTARY_FILTER
-        } else {
-            Mode.KALMAN_FILTER
-        }
-        return mode
-    }
+
 
     private fun showHelpDialog() {
         helpDialog = Dialog(this)
@@ -142,13 +124,28 @@ open class GyroscopeActivity : AppCompatActivity() {
     }
 
     private fun updateText() {
-        tvXAxis!!.text = String.format(Locale.getDefault(),"%.1f", Math.toDegrees(fusedOrientation[1].toDouble()))
-//        tvYAxis!!.text = String.format(Locale.getDefault(),"%.1f", (Math.toDegrees(fusedOrientation[2].toDouble()) + 360) % 360)
-        tvZAxis!!.text = String.format(Locale.getDefault(),"%.1f", Math.toDegrees(fusedOrientation[0].toDouble()))
+        binding.valueXAxisCalibrated.text = String.format(Locale.getDefault(),"%.1f", Math.toDegrees(fusedOrientation[1].toDouble()))
+        binding.valueZAxisCalibrated.text = String.format(Locale.getDefault(),"%.1f", Math.toDegrees(fusedOrientation[0].toDouble()))
         val param = FrameLayout.LayoutParams(20,20)
-        param.leftMargin = abs(Math.toDegrees(fusedOrientation[0].toDouble()).toInt())*10
-        param.topMargin = abs(Math.toDegrees(fusedOrientation[1].toDouble()).toInt())*10
+
+        (Math.toDegrees(fusedOrientation[0].toDouble())*sensitivity).toInt().let {
+            if (lastX == null) lastX = it
+            val deltaX = it - lastX!!
+            lastX = it
+            val currentLeftMargin = binding.pointer.marginLeft
+            param.leftMargin = (deltaX + currentLeftMargin).coerceIn(0, binding.root.width)
+        }
+
+        (Math.toDegrees(fusedOrientation[1].toDouble())*sensitivity).toInt().let {
+            if (lastY == null) lastY = it
+            val deltaY = it - lastY!!
+            lastY = it
+            val currentTopMargin = binding.pointer.marginTop
+            param.topMargin = (deltaY + currentTopMargin).coerceIn(0, binding.root.height)
+        }
         binding.pointer.layoutParams = param
+        binding.xDelta.text = param.leftMargin.toString()
+        binding.yDelta.text = param.topMargin.toString()
     }
 
     private fun updateGauges() {
@@ -165,6 +162,21 @@ open class GyroscopeActivity : AppCompatActivity() {
 
     private enum class Mode {
         GYROSCOPE_ONLY, COMPLIMENTARY_FILTER, KALMAN_FILTER
+    }
+
+    private fun readPrefs(): Mode {
+        meanFilterEnabled = prefMeanFilterEnabled
+        val complimentaryFilterEnabled = prefComplimentaryEnabled
+        val kalmanFilterEnabled = prefKalmanEnabled
+        if (meanFilterEnabled) meanFilter!!.setTimeConstant(prefMeanFilterTimeConstant)
+        val mode: Mode = if (!complimentaryFilterEnabled && !kalmanFilterEnabled) {
+            Mode.GYROSCOPE_ONLY
+        } else if (complimentaryFilterEnabled) {
+            Mode.COMPLIMENTARY_FILTER
+        } else {
+            Mode.KALMAN_FILTER
+        }
+        return mode
     }
 
     private val prefMeanFilterEnabled: Boolean
